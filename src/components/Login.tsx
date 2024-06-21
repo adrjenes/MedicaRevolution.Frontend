@@ -1,23 +1,36 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import * as yup from 'yup';
 import RightSideAuth from './RightSideAuth';
+import { loginSchema } from '../validations/loginSchema';
+import { LoginUserCommand, LoginUserResponse, ErrorResponse } from '../types/types';
 
-function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    setError(null);
     try {
-      const response = await axios.post('https://localhost:5555/api/account/login', { email, password });
+      const formData: LoginUserCommand = { email, password };
+      await loginSchema.validate(formData, { abortEarly: false });
+      const response = await axios.post<LoginUserResponse>('https://localhost:5555/api/account/login', formData);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         navigate('/home');
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      // Handle error display to user
+      if (error instanceof yup.ValidationError) {
+        setError(error.errors[0]);
+      } else if (axios.isAxiosError(error) && error.response) {
+        const serverError = error as AxiosError<ErrorResponse>;
+        setError(serverError.response?.data.message || 'Login failed.');
+      } else {
+        setError('Login failed.');
+      }
     }
   };
   useEffect(() => {
@@ -26,6 +39,7 @@ function Login() {
       navigate('/home');
     }
   }, [navigate]);
+
   return (
     <div className="flex w-full h-screen">
       <div className="w-full flex items-center justify-center lg:w-1/2">
@@ -54,6 +68,11 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            {error && (
+            <div className="mt-4 -mb-8 bg-red-100 p-4 rounded-md">
+              <p className="text-red-700">{error}</p>
+            </div>
+          )}
             <div className="mt-12 flex flex-col gap-y-4">
               <button
                 className="active:scale-[.98] active:duration-75 hover:scale-[1.01] ease-in-out transition-all py-3 rounded-xl bg-violet-500 text-white text-lg font-bold"
