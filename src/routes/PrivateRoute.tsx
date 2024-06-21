@@ -1,8 +1,13 @@
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-const PrivateRoute = ({ element: Element, ...rest }: any) => {
+interface PrivateRouteProps {
+  element: React.ReactElement;
+}
+
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ element, ...rest }) => {
   const token = localStorage.getItem('token');
-  return token ? <Element {...rest} /> : <Navigate to="/login" />;
+  return token ? element : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;
