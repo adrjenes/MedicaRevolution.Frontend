@@ -5,12 +5,14 @@ import * as yup from 'yup';
 import RightSideAuth from './RightSideAuth';
 import { loginSchema } from '../validations/loginSchema';
 import { LoginUserCommand, LoginUserResponse, ErrorResponse } from '../types/types';
+import { useToken } from '../token/TokenContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { saveToken } = useToken();
 
   const handleLogin = async () => {
     setError(null);
@@ -19,7 +21,7 @@ const Login: React.FC = () => {
       await loginSchema.validate(formData, { abortEarly: false });
       const response = await axios.post<LoginUserResponse>('https://localhost:5555/api/account/login', formData);
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
+        saveToken(response.data.token);
         navigate('/home');
       }
     } catch (error) {
@@ -33,6 +35,7 @@ const Login: React.FC = () => {
       }
     }
   };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -69,10 +72,10 @@ const Login: React.FC = () => {
               />
             </div>
             {error && (
-            <div className="mt-4 -mb-8 bg-red-100 p-4 rounded-md">
-              <p className="text-red-700">{error}</p>
-            </div>
-          )}
+              <div className="mt-4 -mb-8 bg-red-100 p-4 rounded-md">
+                <p className="text-red-700">{error}</p>
+              </div>
+            )}
             <div className="mt-12 flex flex-col gap-y-4">
               <button
                 className="active:scale-[.98] active:duration-75 hover:scale-[1.01] ease-in-out transition-all py-3 rounded-xl bg-violet-500 text-white text-lg font-bold"
