@@ -6,7 +6,19 @@ export interface RegisterPatientCommand {
     password: string;
     phoneNumber: string;
   }
-  
+  export interface PatientForm {
+    id: string;
+    firstName: string;
+    lastName: string;
+    pesel: string;
+    email: string;
+    phoneNumber: string;
+    diagnosis: string;
+    doctorConclusions: string;
+    pdfFileName: string;
+    createdAt: string;
+    responseDateDoctor: string | null;
+  }
   export interface RegisterPatientResponse {
     token: string;
   }
@@ -22,3 +34,4 @@ export interface RegisterPatientCommand {
   export interface ErrorResponse {
     message: string;
   }
+

@@ -8,6 +8,7 @@ import Register from '../components/Register';
 import Layout from '../components/Layout';
 import { TokenProvider, useToken } from '../token/TokenContext';
 import Forms from '../components/Forms';
+import PatientDetails from '../components/PatientDetails';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/" element={<ConditionalNavigate />} />
           <Route path="/home" element={<PrivateRoute element={<Layout><Home /></Layout>} />} />
           <Route path="/forms" element={<PrivateRoute element={<Layout><Forms /></Layout>} />} />
+          <Route path="/forms/:id" element={<PrivateRoute element={<Layout><PatientDetails /></Layout>} />} />
           <Route path="/login" element={<PublicRoute restricted={true} element={<Login />} />} />
           <Route path="/register" element={<PublicRoute restricted={true} element={<Register />} />} />
         </Routes>
