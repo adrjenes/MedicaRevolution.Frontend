@@ -15,6 +15,7 @@ const Forms: React.FC = () => {
     page: 0,
   });
   const [editedRows, setEditedRows] = useState<{ [key: string]: Partial<PatientForm> }>({});
+  const [generatePDF, setGeneratePDF] = useState<{ [key: string]: boolean }>({});
   const { token } = useToken();
   const navigate = useNavigate();
 
@@ -46,7 +47,14 @@ const Forms: React.FC = () => {
     fetchPatientForms();
   }, [token]);
 
-  const generatePDF = async (form: PatientForm) => {
+  const handleCheckboxChange = (patientId: string, checked: boolean) => {
+    setGeneratePDF((prev) => ({
+      ...prev,
+      [patientId]: checked,
+    }));
+  };
+
+  const generatePDFFile = async (form: PatientForm) => {
     const doc = new jsPDF('p', 'mm', 'a4');
 
     const img = new Image();
@@ -84,7 +92,8 @@ const Forms: React.FC = () => {
         doc.text(doctorLastName, 155, 113.5); // Nazwisko lekarza
 
         // Zapisz PDF
-        const pdfFileName = `${firstName}-${lastName}1.pdf`;
+        const uniqueId = new Date().getTime();
+        const pdfFileName = `${firstName}-${lastName}-${uniqueId}.pdf`;
         const pdfBlob = doc.output('blob');
         const pdfFile = new File([pdfBlob], pdfFileName, { type: 'application/pdf' });
 
@@ -108,9 +117,11 @@ const Forms: React.FC = () => {
     }
 
     try {
-      const pdfFile = await generatePDF(form);
       const formData = new FormData();
-      formData.append('file', pdfFile);
+      if (generatePDF[patientId]) {
+        const pdfFile = await generatePDFFile(form);
+        formData.append('file', pdfFile);
+      }
       Object.keys(updatedFields).forEach(key => {
         formData.append(key, (updatedFields as any)[key]);
       });
@@ -147,6 +158,20 @@ const Forms: React.FC = () => {
     { field: 'email', headerName: 'E-mail', width: 180, headerAlign: 'center', align: 'center' },
     { field: 'diagnosis', headerName: 'Diagnosis', width: 180, editable: true, headerAlign: 'center', align: 'center' },
     { field: 'doctorConclusions', headerName: 'Doctor Conclusions', width: 200, editable: true, headerAlign: 'center', align: 'center' },
+    {
+      field: 'generateL4',
+      headerName: 'Generate L4',
+      renderCell: (params) => (
+        <input
+          type="checkbox"
+          checked={generatePDF[params.row.id] || false}
+          onChange={(e) => handleCheckboxChange(params.row.id, e.target.checked)}
+        />
+      ),
+      width: 150,
+      headerAlign: 'center',
+      align: 'center',
+    },
     { field: 'createdAt', headerName: 'Created At', width: 180, headerAlign: 'center', align: 'center' },
     {
       field: 'send',
