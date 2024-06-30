@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useToken } from '../token/TokenContext';
 import { PatientForm } from '../types/types';
-
+import { localeText } from '../translate/tableMUI';
+import { format } from 'date-fns';
 const Forms: React.FC = () => {
   const [patientForms, setPatientForms] = useState<GridRowsProp<PatientForm>>([]);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
@@ -13,7 +14,6 @@ const Forms: React.FC = () => {
   });
   const { token } = useToken();
   const navigate = useNavigate();
-
   const fetchPatientForms = async () => {
     try {
       if (!token) {
@@ -27,13 +27,14 @@ const Forms: React.FC = () => {
       const dataWithRowNumbers = response.data.map((form, index) => ({
         ...form,
         rowNumber: index + 1,
+        createdAt: format(new Date(form.createdAt), 'yyyy-MM-dd HH:mm:ss'),
+        responseDateDoctor: form.responseDateDoctor ? format(new Date(form.responseDateDoctor), 'yyyy-MM-dd HH:mm:ss') : null,
       }));
       setPatientForms(dataWithRowNumbers);
     } catch (error) {
       console.error('Error fetching patient forms:', error);
     }
   };
-
   useEffect(() => {
     fetchPatientForms();
   }, [token]);
@@ -45,17 +46,19 @@ const Forms: React.FC = () => {
     { field: 'pesel', headerName: 'PESEL', width: 120, headerAlign: 'center', align: 'center' },
     { field: 'phoneNumber', headerName: 'Numer telefonu', width: 160, headerAlign: 'center', align: 'center' },
     { field: 'email', headerName: 'E-mail', width: 180, headerAlign: 'center', align: 'center' },
-    { field: 'diagnosis', headerName: 'Diagnosis', width: 180, editable: true, headerAlign: 'center', align: 'center' },
-    { field: 'doctorConclusions', headerName: 'Doctor Conclusions', width: 200, editable: true, headerAlign: 'center', align: 'center' },
-    { field: 'createdAt', headerName: 'Created At', width: 180, headerAlign: 'center', align: 'center' },
-    { field: 'responseDateDoctor', headerName: 'Response Date', width: 150, headerAlign: 'center', align: 'center' },
+    { field: 'diagnosis', headerName: 'Diagnoza', width: 180, headerAlign: 'center', align: 'center' },
+    { field: 'doctorConclusions', headerName: 'Wnioski lekarza', width: 180, headerAlign: 'center', align: 'center' },
+    { field: 'createdAt', headerName: 'Utworzono', width: 180, headerAlign: 'center', align: 'center' },
+    { field: 'responseDateDoctor', headerName: 'Czas odpowiedzi', width: 180, headerAlign: 'center', align: 'center' },
     {
       field: 'details',
-      headerName: 'Details',
+      headerName: 'Szczegóły',
       headerAlign: 'center',
       align: 'center',
       renderCell: (params) => (
-        <button onClick={() => navigate(`/forms/${params.row.id}`)}>View Details</button>
+        <button onClick={() => navigate(`/forms/${params.row.id}`)}>
+          <img src="https://medicalovesadev.blob.core.windows.net/logos-public/edit-button.png" alt="Edit" className="w-8 h-8 mt-2" />
+        </button>
       ),
       width: 150,
     },
@@ -64,8 +67,20 @@ const Forms: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center w-full h-full bg-gray-100">
-      <div className="px-4" style={{ width: '100%', height: '80%' }}>
-        <DataGrid rows={patientForms} columns={columns} paginationModel={paginationModel} onPaginationModelChange={setPaginationModel} pageSizeOptions={[10]} getRowId={getRowId}/>
+      <div className="px-4 flex justify-center items-center w-11/12 h-4/5">
+      <DataGrid 
+        rows={patientForms}
+        columns={columns}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10]}
+        getRowId={getRowId}
+        localeText={localeText}
+        sx={{ 
+          '& .MuiDataGrid-row:hover': { bgcolor: '#E6E6FA' },
+        }}
+        className="shadow-[0_1px_6px_-1px_rgba(126,34,206,0.3),_0_2px_4px_-1px_rgba(126,34,206,0.2)]"
+      />
       </div>
     </div>
   );
