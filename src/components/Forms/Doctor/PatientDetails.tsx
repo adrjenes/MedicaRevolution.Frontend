@@ -79,7 +79,7 @@ const PatientDetails: React.FC = () => {
           const doctorLastName = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"];
           doc.setFontSize(12);
           doc.text(`${firstName} ${lastName}`, 44, 49);
-          doc.text(createdAt.slice(0,10), 175, 8);
+          doc.text(createdAt.slice(0, 10), 175, 8);
           doc.text(PESEL, 22, 64.6);
           const splitDiagnosisText = doc.splitTextToSize(diagnosisText, 170); // Adjust width to fit within the template
           doc.text(splitDiagnosisText, 32, 82.6);
@@ -119,6 +119,7 @@ const PatientDetails: React.FC = () => {
       formData.append('email', patient.email);
       formData.append('diagnosis', diagnosis);
       formData.append('doctorConclusions', doctorConclusions);
+      formData.append('isArchive', 'true'); 
 
       await axios.patch(`https://localhost:5555/api/doctor/update-and-upload/${patientId}`, formData, {
         headers: {
@@ -140,8 +141,8 @@ const PatientDetails: React.FC = () => {
   return (
     <div className="flex justify-center items-center p-2">
       <div className="w-full max-w-7xl bg-white rounded-lg p-6 relative shadow-xl">
-        <button 
-          onClick={() => navigate('/forms')} 
+        <button
+          onClick={() => navigate('/forms')}
           className="absolute top-5 left-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
         >
           Wróć do formularzy
@@ -165,25 +166,25 @@ const PatientDetails: React.FC = () => {
             </div>
             <div className="col-span-2 md:col-span-3">
               <div className="pt-3 pb-8">
-                <ValidatedTextField 
-                  label="Diagnoza" 
-                  value={diagnosis} 
-                  onChange={(e) => setDiagnosis(e.target.value)} 
-                  minLength={200} 
-                  maxLength={1000} 
-                  fullWidth 
-                  multiline 
+                <ValidatedTextField
+                  label="Diagnoza"
+                  value={diagnosis}
+                  onChange={(e) => setDiagnosis(e.target.value)}
+                  minLength={200}
+                  maxLength={1000}
+                  fullWidth
+                  multiline
                 />
               </div>
               <div className="pb-2">
-                <ValidatedTextField 
-                  label="Doctor Conclusions" 
-                  value={doctorConclusions} 
-                  onChange={(e) => setDoctorConclusions(e.target.value)} 
-                  minLength={200} 
-                  maxLength={1000} 
-                  fullWidth 
-                  multiline 
+                <ValidatedTextField
+                  label="Doctor Conclusions"
+                  value={doctorConclusions}
+                  onChange={(e) => setDoctorConclusions(e.target.value)}
+                  minLength={200}
+                  maxLength={1000}
+                  fullWidth
+                  multiline
                 />
               </div>
               <FormControlLabel
