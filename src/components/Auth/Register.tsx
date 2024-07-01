@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import * as yup from 'yup';
-
+import { RegisterPatientCommand, RegisterPatientResponse } from '../../types/types';
+import { registerSchema } from '../../validations/registerSchema';
 import RightSideAuth from './RightSideAuth';
-import { registerSchema } from '../validations/registerSchema';
-import { RegisterPatientCommand, RegisterPatientResponse, ErrorResponse } from '../types/types';
 
 const Register: React.FC = () => {
   const [firstName, setFirstName] = useState<string>('');
@@ -31,9 +30,6 @@ const Register: React.FC = () => {
       if (error instanceof yup.ValidationError) {
         // Ustawienie tylko pierwszego błędu
         setError(error.errors[0]);
-      } else if (axios.isAxiosError(error) && error.response) {
-        const serverError = error as AxiosError<ErrorResponse>;
-        setError(serverError.response?.data.message || 'Registration failed.');
       } else {
         setError('Registration failed.');
       }

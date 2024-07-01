@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { DataGrid, GridColDef, GridRowsProp, GridPaginationModel, GridRowIdGetter } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useToken } from '../token/TokenContext';
-import { PatientForm } from '../types/types';
-import { localeText } from '../translate/tableMUI';
+import { useToken } from '../../../token/TokenContext';
+import { PatientForm } from '../../../types/types';
+import { localeText } from '../../../translate/tableMUI';
 import { format } from 'date-fns';
 const Forms: React.FC = () => {
   const [patientForms, setPatientForms] = useState<GridRowsProp<PatientForm>>([]);

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import * as yup from 'yup';
+import { useToken } from '../../token/TokenContext';
+import { LoginUserCommand, LoginUserResponse } from '../../types/types';
+import { loginSchema } from '../../validations/loginSchema';
 import RightSideAuth from './RightSideAuth';
-import { loginSchema } from '../validations/loginSchema';
-import { LoginUserCommand, LoginUserResponse, ErrorResponse } from '../types/types';
-import { useToken } from '../token/TokenContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -27,9 +27,6 @@ const Login: React.FC = () => {
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         setError(error.errors[0]);
-      } else if (axios.isAxiosError(error) && error.response) {
-        const serverError = error as AxiosError<ErrorResponse>;
-        setError(serverError.response?.data.message || 'Login failed.');
       } else {
         setError('Login failed.');
       }

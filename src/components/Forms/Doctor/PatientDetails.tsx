@@ -1,32 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { useToken } from '../token/TokenContext';
 import jsPDF from 'jspdf';
-import { PatientForm } from '../types/types';
 import { jwtDecode } from 'jwt-decode';
-import { Button, Checkbox, FormControlLabel } from '@mui/material';
+import { FormControlLabel } from '@mui/material';
 import { JwtPayload } from "jwt-decode";
 import { format } from 'date-fns';
-import { styled } from '@mui/material/styles';
-import ValidatedTextField from './ValidatedTextField';
+import { PatientForm } from '../../../types/types';
+import ValidatedTextField from '../../UI/ValidatedTextField';
+import ValidatedCheckbox from '../../UI/ValidatedCheckBox';
+import ValidatedButton from '../../UI/ValidatedButton';
+import { useToken } from '../../../token/TokenContext';
 
 export interface DecodedToken extends JwtPayload {
   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname": string;
 }
-const PurpleCheckbox = styled(Checkbox)({
-  color: '#7e22ce',
-  '&.Mui-checked': {
-    color: '#7e22ce',
-  },
-});
-const PurpleButton = styled(Button)({
-  backgroundColor: '#7e22ce',
-  '&:hover': {
-    backgroundColor: '#6a1bb1',
-  },
-  color: 'white',
-});
+
 const PatientDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { token } = useToken();
@@ -75,29 +64,28 @@ const PatientDetails: React.FC = () => {
       img.onload = () => {
         try {
           const imgWidth = 210;
-          const imgHeight = (imgWidth * 798) / 1140;
+          const imgHeight = (imgWidth * 1134) / 1137;
           doc.addImage(img, 'PNG', 0, 0, imgWidth, imgHeight);
           const firstName = patient.firstName ? patient.firstName.toString() : '';
           const lastName = patient.lastName ? patient.lastName.toString() : '';
-          const createdAt = patient.createdAt ? patient.createdAt.toString().slice(0, -17) : '';
+          const createdAt = patient.createdAt ? patient.createdAt.toString() : '';
           const PESEL = patient.pesel ? patient.pesel.toString() : '';
           const diagnosisText = diagnosis ? diagnosis.toString() : '';
-
           if (!token) {
             reject(new Error('Token is null'));
             return;
           }
           const decodedToken = jwtDecode<DecodedToken>(token);
           const doctorLastName = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"];
-
           doc.setFontSize(12);
           doc.text(`${firstName} ${lastName}`, 44, 49);
-          doc.text(createdAt, 175, 8);
+          doc.text(createdAt.slice(0,10), 175, 8);
           doc.text(PESEL, 22, 64.6);
-          doc.text(diagnosisText, 32, 82.6);
-          doc.text(doctorLastName, 155, 113.5);
-          const uniqueId = new Date().getTime();
-          const pdfFileName = `${firstName}-${lastName}-${uniqueId}.pdf`;
+          const splitDiagnosisText = doc.splitTextToSize(diagnosisText, 170); // Adjust width to fit within the template
+          doc.text(splitDiagnosisText, 32, 82.6);
+          doc.text(doctorLastName, 155, 168);
+          const uniqueIdByDate = new Date().getTime();
+          const pdfFileName = `${firstName}-${lastName}-${uniqueIdByDate}.pdf`;
           const pdfBlob = doc.output('blob');
           const pdfFile = new File([pdfBlob], pdfFileName, { type: 'application/pdf' });
           resolve(pdfFile);
@@ -151,7 +139,7 @@ const PatientDetails: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center p-2">
-      <div className="w-full max-w-6xl bg-white rounded-lg p-6 relative shadow-xl">
+      <div className="w-full max-w-7xl bg-white rounded-lg p-6 relative shadow-xl">
         <button 
           onClick={() => navigate('/forms')} 
           className="absolute top-5 left-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
@@ -160,43 +148,57 @@ const PatientDetails: React.FC = () => {
         </button>
         <h1 className="text-2xl font-bold mb-10 text-center">Szczegóły pacjenta</h1>
         <div className="space-y-2">
-        <div className="grid grid-cols-4 text-lg">
-        <div className="space-y-">
-          <div><span className="font-semibold">Imię:</span></div>
-          <div>{patient.firstName}</div>
-          <div><span className="font-semibold">Nazwisko:</span></div>
-          <div>{patient.lastName}</div>
-          <div><span className="font-semibold">PESEL:</span></div>
-          <div>{patient.pesel}</div>
-          <div><span className="font-semibold">Numer telefonu:</span></div>
-          <div>{patient.phoneNumber}</div>
-          <div><span className="font-semibold">E-mail:</span></div>
-          <div>{patient.email}</div>
-          <div><span className="font-semibold">Utworzono:</span></div>
-          <div>{patient.createdAt}</div>
-          </div>
-          <div className="col-span-2 md:col-span-3">
-            <div className="pt-3 pb-8">
-              <ValidatedTextField label="Diagnoza" value={diagnosis} onChange={(e) => setDiagnosis(e.target.value)} 
-              minLength={200} maxLength={1000} fullWidth multiline />
+          <div className="grid grid-cols-4 text-lg">
+            <div className="space-y-">
+              <div><span className="font-semibold">Imię:</span></div>
+              <div>{patient.firstName}</div>
+              <div><span className="font-semibold">Nazwisko:</span></div>
+              <div>{patient.lastName}</div>
+              <div><span className="font-semibold">PESEL:</span></div>
+              <div>{patient.pesel}</div>
+              <div><span className="font-semibold">Numer telefonu:</span></div>
+              <div>{patient.phoneNumber}</div>
+              <div><span className="font-semibold">E-mail:</span></div>
+              <div>{patient.email}</div>
+              <div><span className="font-semibold">Utworzono:</span></div>
+              <div>{patient.createdAt}</div>
+            </div>
+            <div className="col-span-2 md:col-span-3">
+              <div className="pt-3 pb-8">
+                <ValidatedTextField 
+                  label="Diagnoza" 
+                  value={diagnosis} 
+                  onChange={(e) => setDiagnosis(e.target.value)} 
+                  minLength={200} 
+                  maxLength={1000} 
+                  fullWidth 
+                  multiline 
+                />
               </div>
               <div className="pb-2">
-              <ValidatedTextField label="Doctor Conclusions" value={doctorConclusions} onChange={(e) => setDoctorConclusions(e.target.value)} 
-              minLength={200} maxLength={1000} fullWidth multiline />
-             </div>
+                <ValidatedTextField 
+                  label="Doctor Conclusions" 
+                  value={doctorConclusions} 
+                  onChange={(e) => setDoctorConclusions(e.target.value)} 
+                  minLength={200} 
+                  maxLength={1000} 
+                  fullWidth 
+                  multiline 
+                />
+              </div>
               <FormControlLabel
-               control= {
-                  <PurpleCheckbox checked={generatePDF} onChange={(e) => setGeneratePDF(e.target.checked)} />
-               }
-               label="Generuj zaświadczenie lekarskie"
-               className="text-lg"
-               />
-               </div>
-               </div>
-               <div className="flex justify-center">
-                <PurpleButton onClick={handleUploadAndUpdate} variant="contained" color="primary">
-                  Wyślij
-                </PurpleButton>
+                control={
+                  <ValidatedCheckbox checked={generatePDF} onChange={(e) => setGeneratePDF(e.target.checked)} />
+                }
+                label="Generuj zaświadczenie lekarskie"
+                className="text-lg"
+              />
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <ValidatedButton onClick={handleUploadAndUpdate} variant="contained" color="primary">
+              Wyślij
+            </ValidatedButton>
           </div>
         </div>
       </div>
