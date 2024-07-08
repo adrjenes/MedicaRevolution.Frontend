@@ -32,7 +32,7 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
 
   const saveToken = (newToken: string) => {
     localStorage.setItem('token', newToken);
-    setToken(newToken);  // Aktualizuj stan tokena
+    setToken(newToken);  
   };
 
   const removeToken = () => {

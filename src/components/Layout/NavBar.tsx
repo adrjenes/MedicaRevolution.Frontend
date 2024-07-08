@@ -32,7 +32,7 @@ const NavBar: React.FC = () => {
 
   return (
     <nav className="bg-purple-500 text-white p-4 flex justify-between items-center h-16">
-      <div className="text-2xl font-semibold">MedicaLove</div>
+      <div className="text-2xl font-semibold">MedicaRevolution</div>
       <div className="flex space-x-4">
         {role === 'Doctor' ? (
           <Link to="/forms" className="hover:underline">

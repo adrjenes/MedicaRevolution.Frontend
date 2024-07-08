@@ -1,0 +1,31 @@
+.custom-rangepicker .ant-picker-active-bar {
+  background: #800080; 
+}
+
+.custom-rangepicker .ant-picker-input > input {
+  color: #800080; 
+}
+
+.custom-rangepicker .ant-picker-clear {
+  color: #800080; 
+}
+
+.custom-rangepicker .ant-picker-suffix {
+  color: #800080; 
+}
+
+.custom-rangepicker .ant-picker-panel-container {
+  border-color: #800080; 
+}
+
+.custom-rangepicker .ant-picker-dropdown {
+  border-color: #800080; 
+}
+
+.custom-rangepicker .ant-picker-dropdown .ant-picker-cell-selected .ant-picker-cell-inner {
+  background-color: #800080;
+}
+
+.custom-rangepicker .ant-picker-dropdown .ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: #800080; 
+}

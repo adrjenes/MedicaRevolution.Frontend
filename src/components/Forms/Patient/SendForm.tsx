@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToken } from '../../../token/TokenContext';
 import ValidatedTextField from '../../UI/ValidatedTextField';
 import ValidatedButton from '../../UI/ValidatedButton';
-
+import { toast } from 'react-toastify';
 
 const SendForm: React.FC = () => {
   const [description, setDescription] = useState('');
@@ -23,14 +23,14 @@ const SendForm: React.FC = () => {
         }
       );
       if (response.status === 200) {
-        alert('Form sent successfully');
-        navigate('/my-forms'); // Navigate to some other route after success
+        toast.success('Wysłano formularz do lekarza.');
+        navigate('/my-forms');
       } else {
-        alert('Failed to send form');
+        toast.error('Nie udało się wysłać formularza.');
       }
     } catch (error) {
       console.error('Error sending form:', error);
-      alert('Failed to send form');
+      toast.error('Nie udało się wysłać formularza.');
     }
   };
 

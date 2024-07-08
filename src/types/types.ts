@@ -16,6 +16,8 @@ export interface RegisterPatientCommand {
     diagnosis: string;
     doctorConclusions: string;
     pdfFileName: string;
+    startDate: string | null;
+    endDate: string | null;
     isArchive: boolean;
     createdAt: string;
     responseDateDoctor: string | null;

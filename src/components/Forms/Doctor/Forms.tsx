@@ -6,16 +6,15 @@ import { useToken } from '../../../token/TokenContext';
 import { PatientForm } from '../../../types/types';
 import { localeText } from '../../../translate/tableMUI';
 import { format } from 'date-fns';
-import { Checkbox } from '@mui/material';
 import ValidatedCheckbox from '../../UI/ValidatedCheckBox';
 
 const Forms: React.FC = () => {
   const [patientForms, setPatientForms] = useState<GridRowsProp<PatientForm>>([]);
+  const [showArchived, setShowArchived] = useState(false);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     pageSize: 10,
     page: 0,
   });
-  const [showArchived, setShowArchived] = useState(false);
   const { token } = useToken();
   const navigate = useNavigate();
 
@@ -85,9 +84,7 @@ const Forms: React.FC = () => {
       width: 150,
     },
   ];
-
   const getRowId: GridRowIdGetter<PatientForm> = (row) => row.id;
-
   return (
     <div className="flex flex-col items-center w-full h-full bg-gray-100">
       <div className="flex items-center justify-end w-11/12 my-4 mr-12">

@@ -26,12 +26,30 @@ const MyForms: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const dataWithRowNumbers = response.data.map((form, index) => ({
-        ...form,
-        rowNumber: index + 1,
-        createdAt: format(new Date(form.createdAt), 'yyyy-MM-dd HH:mm:ss'),
-        responseDateDoctor: form.responseDateDoctor ? format(new Date(form.responseDateDoctor), 'yyyy-MM-dd HH:mm:ss') : null,
-      }));
+
+      const dataWithRowNumbers = response.data.map((form, index) => {
+        const updatedForm: PatientForm = { ...form };
+
+        if (!updatedForm.isArchive) {
+          if (updatedForm.diagnosis === '') {
+            updatedForm.diagnosis = 'W trakcie...';
+          }
+          if (updatedForm.doctorConclusions === '') {
+            updatedForm.doctorConclusions = 'W trakcie...';
+          }
+        }
+        if (updatedForm.responseDateDoctor === '' || updatedForm.responseDateDoctor === null) {
+          updatedForm.responseDateDoctor = 'W trakcie...';
+        }
+
+        return {
+          ...updatedForm,
+          rowNumber: index + 1,
+          createdAt: format(new Date(updatedForm.createdAt), 'yyyy-MM-dd HH:mm:ss'),
+          responseDateDoctor: updatedForm.responseDateDoctor !== 'W trakcie...' ? format(new Date(updatedForm.responseDateDoctor), 'yyyy-MM-dd HH:mm:ss') : updatedForm.responseDateDoctor,
+        };
+      });
+
       setPatientForms(dataWithRowNumbers);
     } catch (error) {
       console.error('Error fetching my patient forms:', error);
@@ -66,6 +84,7 @@ const MyForms: React.FC = () => {
       width: 150,
     },
   ];
+
   const getRowId: GridRowIdGetter<PatientForm> = (row) => row.id;
 
   return (

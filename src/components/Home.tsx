@@ -1,13 +1,14 @@
 import React from 'react';
-import { useToken } from '../token/TokenContext';
 
 const Home: React.FC = () => {
-  const { token } = useToken();
-
   return (
-    <div className="text-white break-words">
-      <h1>Home</h1>
-      <p>Your token is: {token}</p>
+    <div className="w-full h-full flex flex-col justify-center items-center text-3xl text-center">
+      <div>
+        Witaj w aplikacji medycznej <span className="text-violet-500">MedicaRevolution.</span>
+      </div>
+      <div className="pt-8">
+        Przejdź do odpowiedniej zakładki.
+      </div>
     </div>
   );
 };
